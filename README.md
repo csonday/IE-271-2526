@@ -1,3 +1,3 @@
-# IE 271 AY 2526, 2nd Semester
+# Introduction to SQL
 
-Please access the branches for the resources. Thank you. 
+
