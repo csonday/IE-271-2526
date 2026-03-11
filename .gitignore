@@ -1,1 +1,6 @@
 *.code-workspace
+settings.json
+.pycache__/
+.vscode/
+.venv/
+__pycache__/
