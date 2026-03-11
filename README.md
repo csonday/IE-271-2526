@@ -37,19 +37,19 @@ For this section, you will need access to the following
 
 
 ##  2. <a name='PythonVirtualEnvironments'></a>Python Virtual Environments
-Generally, a **Python Virtual Environment** is an isolated space within your computer where you can work on your Python projects -- separately from your system-installed Python [^1]. 
+Generally, a **Python Virtual Environment** is an isolated space within your computer where you can work on your Python projects -- separately from your system-installed Python. 
 
-**Why?**
+**Why build an isolated space?**
 
-In web development, all projects do not have the same dependencies or packages (see imports). Some projects will require `pandas`, some projects don't. Some projects need special packages for AI, some do not.
+In the context of managing codespaces, we start "building" different versions of Python everytime we work on projects. We "customize" these installations by adding dependencies or packages -- this is how we make each version of Python specific to a project or task. Some projects will require `pandas`, some projects don't. Some projects need special packages for AI, some do not.
 
-**Why?**
+**Why is this important in Web Application?**
 
-To deploy a web application, you have to configure a *virtual Machine* based on the Python settings of your project. A virtual machine (VM) is a remotely accessible computer -- usually connected to a network for web deployment. When a VM is created for a project, it is literally a computer with no applications, only the operating system. You will need to install the required applications.
+To deploy a web application, you have to configure a *Virtual Machine* based on the Python settings of your project. A virtual machine (VM) is a remotely accessible computer -- usually connected to a network for web deployment. When a VM is created for a project, it is literally a computer with no applications, only the operating system. You will need to install the required applications.
 
-**How does a Python Environment help with that?**
+**What do Virtual Environments have to do with VMs?**
 
-When a virtual environment is created, it is a *vanilla* Python -- i.e. no configurations, no installed dependencies. You get to start from scratch and you get to track your configurations. It's like cloning your Python so each project gets its *custom* Python build. 
+To make the VM work, you basically want to copy your "customized Python" into the new computer. You can easily do this by cloning all of the settings and configurations that you did with your Virtual Environments. 
 
 
 ##  3. <a name='CreatingyourFirstVenv'></a>Creating your First Venv
