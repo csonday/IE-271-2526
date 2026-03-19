@@ -1,1 +1,0 @@
-# Follow the instructions in the README.md to set up the environment and run this app.

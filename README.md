@@ -1,15 +1,18 @@
-# Module 1c: CSS Notes
+# Module 2a: App and Database Setup
+
 <!-- vscode-markdown-toc -->
 * 1. [Preliminaries](#Preliminaries)
-* 2. [Custom Style Sheets](#CustomStyleSheets)
-* 3. [External Stylesheets](#ExternalStylesheets)
-* 4. [Using CSS Classes](#UsingCSSClasses)
-* 5. [Creating CSS Classes](#CreatingCSSClasses)
-* 6. [Layouting](#Layouting)
-	* 6.1. [Container Divs](#ContainerDivs)
-	* 6.2. [Units of Measures](#UnitsofMeasures)
-	* 6.3. [Grid](#Grid)
-	* 6.4. [Flex Boxes](#FlexBoxes)
+* 2. [Database Setup](#DatabaseSetup)
+	* 2.1. [Create your Database](#CreateyourDatabase)
+	* 2.2. [Create the Tables](#CreatetheTables)
+* 3. [App Setup](#AppSetup)
+	* 3.1. [Run the Venv](#RuntheVenv)
+	* 3.2. [Install Dependencies](#InstallDependencies)
+* 4. [Create your API](#CreateyourAPI)
+	* 4.1. [Create your `dbconnect.py`](#Createyourdbconnect.py)
+	* 4.2. [Use the API to Access the DB](#UsetheAPItoAccesstheDB)
+* 5. [SQL Injection](#SQLInjection)
+* 6. [Using your API to modify your records](#UsingyourAPItomodifyyourrecords)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -18,151 +21,212 @@
 <!-- /vscode-markdown-toc -->
 
 ##  1. <a name='Preliminaries'></a>Preliminaries
+In module 2, we will be creating a multi-page application with a database backend. Dash will serve as the front-end of this project while Postgresql (pgadmin as interface) will be the backend. Expect some SQL scripts in this module. 
 
-1. Internet connection
-2. Download and copy the assets folder inside `MyFirstApp`
+Please ensure that the following are setup before we begin. 
+* We will need VS Code and pgadmin (Postgresql) for this session. Make sure you have Postgres and Pgadmin installed -- [use this reference](https://www.postgresql.org/download/) for your installers. 
+* For scripts, start with a new folder.
+* Create a new `venv` for this module. 
+* Copy the assets folder (see source code above) into your directory. 
 
-##  2. <a name='CustomStyleSheets'></a>Custom Style Sheets
+Check the following for the desired setup for your directory:
+```
+<main folder>
+    |
+    |- assets
+    |   |- bootstrap.css
+    |   |- custom.css (optional)
+    |- .venv
+        |- <various contents>
+```
 
-Cascading Style Sheets (CSS) are basically used to style HTML elements. In Dash, you can simply add CSS codes via the `style` argument. Try this by modifying your app.layout definition into the following:
+
+##  2. <a name='DatabaseSetup'></a>Database Setup
+Open pgadmin.
+
+###  2.1. <a name='CreateyourDatabase'></a>Create your Database
+Create a database for a new project. 
+
+
+###  2.2. <a name='CreatetheTables'></a>Create the Tables
+There are many ways to create tables on postgres. We will stick with the method that uses SQL. 
+
+Open your query editor by doing the following:
+1. Click on your database on the sidebar until it is highlighted. 
+2. Open the Query Editor. 
+
+Setup the tables `movies` and `genres`. Use the following scripts. 
+
+```sql
+CREATE TABLE genres (
+    genre_id serial primary key not null,
+    genre_name varchar(128),
+    genre_modified_on timestamp without time zone default now(),
+    genre_delete_ind boolean default false
+);
+
+CREATE TABLE movies (
+    movie_id serial primary key not null,
+    movie_name varchar(256),
+    genre_id int references genres(genre_id),
+    movie_release_date date,
+    movie_delete_ind boolean default false
+);
+```
+
+To execute the query, press `F5` or the play button on the taskbar above the query editor. A success message should appear.
+
+##  3. <a name='AppSetup'></a>App Setup
+Now that the database has been setup. Let's go to VS Code. Open your workspaces. 
+
+###  3.1. <a name='RuntheVenv'></a>Run the Venv
+After opening the workspaces, let's make sure that your venv is active. Open a terminal via `Terminal > New Terminal` and execute the following command:
+
+For Windows
+```powershell
+where.exe python
+```
+For MacOS
+```
+which python
+```
+The command will return paths for python. You should see your venv name listed among the outputs. A sample output is shown below. 
+
+```terminal
+PS D:\repos\ie271webdev_notes> where.exe python
+D:\repos\ie271webdev_notes\.venv\Scripts\python.exe
+C:\Users\User\AppData\Local\Programs\Python\Python311\python.exe
+C:\Users\User\AppData\Local\Programs\Python\Python310\python.exe
+C:\Users\User\AppData\Local\Microsoft\WindowsApps\python.exe
+```
+
+
+###  3.2. <a name='InstallDependencies'></a>Install Dependencies
+Once the venv is ensured, we need to install the dependencies. 
+
+For MacOS users, use `pip3` instead of `pip`
+```powershell
+pip install dash
+pip install dash_bootstrap_components
+pip install pandas
+pip install numpy
+pip install psycopg2
+pip install datetime
+```
+
+##  4. <a name='CreateyourAPI'></a>Create your API
+An Application-Program Interface is a tool that is used by programs to communicate to each other. For our first API, we will create python-based scripts that will enable us to execute queries to PostgreSQL from Python. 
+
+###  4.1. <a name='Createyourdbconnect.py'></a>Create your `dbconnect.py`
+Inside your main folder, create the file `dbconnect.py`. Your directory should look like this. 
+```
+<mainfolder>
+    |-assets
+    |-.venv
+    |- dbconnect.py
+```
+
+Inside this new file, add the following scripts. 
 ```python
-app.layout = html.Div(
-    [
-        html.Div(
-            'Hello World',
-            style={'border': '2px solid green'}
-        )
-    ]
-)
+import psycopg2
+import pandas as pd
+
+def getdblocation():
+    db = psycopg2.connect(
+        host='', 
+        database='', 
+        user='', 
+        port=0, 
+        password='', 
+    )
+
+    return db
 ```
-* The `border` is known as a CSS property that you can alter to setup how an element looks like
-* The other side of the pairing is known as the `value` for the property.
+Notes:
+* `db` contains an object that represents your *connection credentials*. This is how your API knows where and that database to access. 
 
+So, where do we get the information to fill-in the credentials? 
 
-We will not be discussing all the possible CSS properties -- they are actually easily searchable on the internet according to your use cases.
+1. Go to pgadmin. 
+2. On the left sidebar, right-click on the **Server containing the database**. Select `Properties...`
 
-##  3. <a name='ExternalStylesheets'></a>External Stylesheets
-In the previous version of your application, you used a stylesheet that came with your import of `dbc`. To customize it, we setup the `assets` folder which contains `bootstrap.css` that you can modify to your liking.
+    ![openserver](./readme_img/serverproperties.png)
 
-In the `bootstrap.css` file, you can find the CSS properties for the HTML elements. when you scroll down, you can also find that some names are prefixed with a `.` -- these are called classes.
+3. In the dialog box, go to `Connection` tab. Copy the details here into `dbconnect.py`.
 
-##  4. <a name='UsingCSSClasses'></a>Using CSS Classes
+    ![servercreds](./readme_img/serverwindow.png)
 
-You can definitely use the classes in `bootstrap.css` into your work. Let's use `w-100` and `text-center` so we can put `Hello World` in the middle of the div. 
+**NOTE on PASSWORD:** The server password is not shown in the dialog box above. You supplied it when you installed postgres. If you have forgotten your password, you may reset it [by running the SQL script here](https://stackoverflow.com/questions/12720967/how-can-i-change-a-postgresql-user-password). 
 
-Put these two classes into the `className` argument of the div of interest. 
+Finally, check if the connection is working. On `dbconnect.py`, add the following and run the entire script. 
 
 ```python
-        html.Div(
-            'Hello World',
-            style={'border': '2px solid green'},
-            className='w-100 text-center'
-        )
+print(getdblocation())
 ```
 
-Here are some of my most used classes:
-* `p-auto`
-* `m-auto`
-* `text-center`
-* `fw-bold`
+The prompt should show a connection object. Any errors indicate issues in the scripts above. Remove the print command after using it. 
 
-##  5. <a name='CreatingCSSClasses'></a>Creating CSS Classes
-In programming, we do not like coding the same thing more than once. Custom CSS classes can be created for elements in your page that are repetitive. Something that I like to keep in my projects is:
-
-```css
-.placeholder-text{
-    color: #777;
-    font-style: italic;
-    font-size: 90%;
-}
-```
-As practice, these custom classes are placed not inside `bootstrap.css` so that we can better track these add-ons. Follow these instructions to setup your `customcss.css`.
-
-1. Create `customcss.css` inside `assets`
-2. Copy and paste the class definition above
-
-Add 2 html.P() elements the `placeholder-text` class so your app looks like this now:
-
-![placehold](./readme_img/placeholdertext.png0)
-
-
-##  6. <a name='Layouting'></a>Layouting
-
-In this section, we will learn the common concerns in layouting. \
-
-###  6.1. <a name='ContainerDivs'></a>Container Divs
-Container divs all have configurable spaces around them that we can use to layout and add whitespace between elements. 
-
-![margins](./readme_img/margins.png)
-
-Let us use these margins and use a border to visualize them. Add this element to your layout, below all the existing elements.
+###  4.2. <a name='UsetheAPItoAccesstheDB'></a>Use the API to Access the DB
+Add the following functions for modifying and querying data from the database. The comments are totally optional. They are for explaining and understanding the scripts. 
 
 ```python
-        html.Div(
-            "New div here",
-            className='border p-2, m-4'
-        )
+def modifyDB(sql, values):
+    db = getdblocation()
+
+    # We create a cursor object
+    # Cursor - a mechanism used to manipulate db objects on a per-row basis
+    # In this case, a cursor is used to add/edit each row
+    cursor = db.cursor()
+
+    # Execute the sql code with the cursor value
+    cursor.execute(sql, values)
+
+    # Make the changes to the db persistent
+    db.commit()
+    # Close the connection (so nobody else can use it)
+    db.close()
+
+
+def getDataFromDB(sql, values, dfcolumns):
+    # ARGUMENTS
+    # sql -- sql query with placeholders (%s)
+    # values -- values for the placeholders
+    # dfcolumns -- column names for the output
+
+    db = getdblocation()
+    cur = db.cursor()
+    cur.execute(sql, values)
+    rows = pd.DataFrame(cur.fetchall(), columns=dfcolumns)
+    db.close()
+    return rows
 ```
 
-Analyze the webpage using the developer tools on your browser. Press `F12`. 
+##  5. <a name='SQLInjection'></a>SQL Injection
+Let's take a break from coding to discuss one of the easiest ways to destroy a non-secure website. 
 
-![inspector](./readme_img/inspector.png)
+In the context of web development, we often take the values of query conditions from text boxes where users can freely type any strings. 
 
-You can highlight your elements and tryout some combinations of settings via the developer tools. You could also learn to read HTML here as well.
-
-###  6.2. <a name='UnitsofMeasures'></a>Units of Measures
-
-[Reference] (https://www.freecodecamp.org/news/css-unit-guide/)
-* Absolute
-  * `px` -- computer pixels
-  *  `cm` -- around 37.8 px
-  *  `mm` -- 1/10 of a cm
-  *  `in` -- 2.54 cm
-  *  `pt` -- points, equivalent to 4/3 px
-*  Relative
-   *  `em` -- relative to the font size of a parent unit
-   *  `rem` -- root em. Based on the font size **of the entire webpage**
-   *  `%` -- percentage of the parent unit
-   *  `vw` -- 1% of the width of the viewing screen. 100vw covers entire screen width.
-   *  `vh` -- 1% of the height of the viewing screen. 100vh covers the entire screen height.
-
-
-###  6.3. <a name='Grid'></a>Grid
-
-Placing divs side-by-side is a common problem for beginners. One way is to adapt a grid-like treatment to the containers. 
-
-In a grid configuration, we have `dbc.Row()` that contain `dbc.Col`. Rows can expand to fill the entire screen, but each row can only have a maximum width of `12` units. 
-
-Add these elements to your layout. 
-```python
-        dbc.Row(
-            [
-                dbc.Col('R1C1, width = 8', width=8, className='border'),
-                dbc.Col('R1C2, width = 4', width=4, className='border'),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col('R2C1, width = 2', width=2, className='border'),
-                dbc.Col('R2C2, width = 2', width=2, className='border'),
-            ]
-        )
+For example, take the login query: 
+```sql
+SELECT user_id FROM users WHERE user_name = <username_val> AND password = <password_val>
 ```
 
-###  6.4. <a name='FlexBoxes'></a>Flex Boxes
-Flex boxes offer another way to layout your divs side by side. 
-
-```python
-        html.Br(),
-        html.Div(
-            [
-                html.Div("box1", className='w-25 border m-auto text-center'),
-                html.Div("box2", className='w-25 border m-auto text-center'),
-            ], 
-            className='d-flex justify-content-between'
-        )
+Say the user inputs the follwing values:
+```
+<username_val> = ''
+<password> = ''; DROP TABLE users;
 ```
 
-* `d-flex` creates a flex display
-* `justify-content-between` adds space between the components
-* `m-auto` maximizes margins and centers the content
+If we substitute the inputs, we get the following SQL command 
+
+```sql
+SELECT user_id FROM users WHERE user_name = '' AND password = ''; DROP TABLE users
+```
+
+You just got hacked. This is called SQL Injection -- when users *inject* SQL scripts through user interfaces to modify your database structure. Obviously, this should be avoided at all costs. 
+
+To avoid this, we use a special placeholder `%s` to indicate values which are inserted by users. These inputs are treated differently as they are assessed for SQL injection incidents. 
+
+## End of submodule
+
+Proceed to `module2b` for the next steps. 
