@@ -16,7 +16,7 @@ navbar = dbc.Navbar(
             html.A(
                 dbc.Row(
                     [
-                        dbc.Col(dbc.NavbarBrand("IE 172 Case App", className="ms-2")),
+                        dbc.Col(dbc.NavbarBrand("IE 271 Case App", className="ms-2")),
                     ],
                     align="center",
                     className='g-0 me-4'

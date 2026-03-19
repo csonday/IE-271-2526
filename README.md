@@ -78,7 +78,7 @@ app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
 
 # Set app title that appears in your browser tab
-app.title = 'IE 172 Sample IS'
+app.title = 'IE 271 Sample IS'
 
 # These 2 lines reduce the logs on your terminal so you could debug better
 # when you encounter errors in app
@@ -166,7 +166,7 @@ Do not forget to add a command to run your server.
 ```python
 if __name__ == '__main__':
     webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True)
-    app.run_server(debug=False)
+    app.run(debug=False)
 
 ```
 
@@ -203,7 +203,7 @@ navbar = dbc.Navbar(
             html.A(
                 dbc.Row(
                     [
-                        dbc.Col(dbc.NavbarBrand("IE 172 Case App", className="ms-2")),
+                        dbc.Col(dbc.NavbarBrand("IE 271 Case App", className="ms-2")),
                     ],
                     align="center",
                     className='g-0 me-4'
